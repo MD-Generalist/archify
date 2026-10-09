@@ -12,6 +12,7 @@ import {
 } from '../archify/renderers/shared/path-semantics.mjs';
 import { checkForUpdate } from '../archify/scripts/check-update.mjs';
 import { stageCleanSkill } from './stage-clean-skill.mjs';
+import { parseRepositoryRemote } from '../archify/renderers/shared/repository-location.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const skillRoot = path.join(repoRoot, 'archify');
@@ -254,10 +255,13 @@ async function runControlledWindowsPathE2E() {
       encoding: 'utf8',
     });
     requireSuccess('repository origin discovery', origin);
+    const repositoryLocation = parseRepositoryRemote(origin.stdout.trim());
+    assert.ok(repositoryLocation, 'repository fixture requires a supported remote identity');
     const evidenceDiagram = JSON.parse(fs.readFileSync(architectureInput, 'utf8'));
     evidenceDiagram.meta.repository = {
-      url: origin.stdout.trim(),
+      url: repositoryLocation.url,
       revision: revision.stdout.trim(),
+      link_mode: 'local-only',
     };
     evidenceDiagram.components[0].sources = [{
       path: 'archify/bin/archify.mjs',
