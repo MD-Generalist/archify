@@ -37,6 +37,7 @@ jobs:
         run: scripts/windows-path-fixtures.ps1 -NodeVersion '${{ matrix.node-version }}' -Cleanup
 
   release:
+    if: github.repository == 'tt-a1i/archify' || vars.ENABLE_FORK_RELEASES == 'true'
     needs: windows-test-portability
     runs-on: ubuntu-latest
     steps:
